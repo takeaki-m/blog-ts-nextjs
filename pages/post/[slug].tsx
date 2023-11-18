@@ -2,7 +2,6 @@ import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
 import {Marked} from 'marked'
-import Image from 'next/image'
 import { NextSeo } from 'next-seo'
 import hljs from 'highlight.js'
 import {markedHighlight} from 'marked-highlight'
@@ -33,7 +32,8 @@ const marked = new Marked(
 // Make BlogPost
 // get frontMatter, slug and content from props
 // key: retrieve the contents of the frontMatter based on keys such as title and description.
-const BlogPost = ({ frontMatter, content, slug }) => {
+// const BlogPost = ({ frontMatter, content, slug }) => {
+const BlogPost = ({ frontMatter, content}) => {
   return (
     <>
       <NextSeo
