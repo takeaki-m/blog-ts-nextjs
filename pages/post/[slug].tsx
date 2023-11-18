@@ -1,25 +1,57 @@
 import fs from 'fs'
 import path from 'path'
 import matter from 'gray-matter'
-import {marked} from 'marked'
-import styles from '../../styles/Home.module.css'
+import {Marked} from 'marked'
 import Image from 'next/image'
-// import React from 'react'
-// import Footer from "@/pages/components/Footer/footer";
-// import Header from "@/pages/components/Header/header";
+import { NextSeo } from 'next-seo'
+import hljs from 'highlight.js'
+import {markedHighlight} from 'marked-highlight'
+
+
+
+
+// const marked = new Marked(
+//   markedHighlight({
+//     langPrefix: 'hljs language-',
+//     highlight(code, lang) {
+//       const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+//       return hljs.highlight(code, { language }).value;
+//     }
+//   })
+// );
+
+const marked = new Marked(
+  markedHighlight({
+    langPrefix: 'hljs language-',
+    highlight(code, lang) {
+      const language = hljs.getLanguage(lang) ? lang : 'plaintext';
+      return hljs.highlight(code, { language }).value;
+    }
+  })
+);
 
 // Make BlogPost
 // get frontMatter, slug and content from props
 // key: retrieve the contents of the frontMatter based on keys such as title and description.
-const BlogPost = (props: { frontMatter: { [key: string]: string }; slug: string; content: string}) => {
+const BlogPost = ({ frontMatter, content, slug }) => {
   return (
-    <div className={styles.container} >
-      <div className="prose prose-sm sm:prose lg:prose-lg mx-auto prose-slate">
-        {/* <Image className="thumbnail" src={props.frontMatter.thumbnail} alt={props.frontMatter.title} width = { 30 } height= { 30 }/>
-        {/* convert md to html with marked */}
-        <div dangerouslySetInnerHTML={{ __html: marked(props.content) }} />
+    <>
+      <NextSeo
+        title={frontMatter.title}
+        description={frontMatter.description}
+        openGraph={{
+          type: 'website',
+          url: `TODO`,
+          title: frontMatter.title,
+          description: frontMatter.description,
+        }}
+      />
+      <div className="prose dark:prose-invert">
+        <h1 className="mt-12">{frontMatter.title}</h1>
+        <span>{frontMatter.date}</span>
+        <div dangerouslySetInnerHTML={{ __html: marked.parse(content) }} />
       </div>
-    </div>
+    </>
   )
 }
 
@@ -56,12 +88,12 @@ export async function getStaticProps({ params: { slug }}: never) {
   const markdownWithMeta = fs.readFileSync(path.join('posts', slug + '.md'), 'utf-8')
   // get frontMatter and content
   // matter: module gets metadata of md files
-  const { data : frontMatter, content } = matter(markdownWithMeta)
+  const { data, content } = matter(markdownWithMeta)
   return {
     props: {
-      frontMatter,
-      slug,
+      frontMatter: data,
       content,
-    },
+      slug: slug
+    }
   }
 }
